@@ -324,17 +324,17 @@ function initApp() {
       } else if (level === '2') {
         // Level 2 entry 번호 설정
         formData.set('entry.XXXXXXXXX', '2') // 레벨 (Level 2)
-        if (data.number) formData.set('entry.1046076771', data.number) // 번호
+        if (data.number) formData.set('entry.670944922', data.number) // 번호
         if (data.name) formData.set('entry.260370643', data.name) // 이름
         if (data.problem) formData.set('entry.1436421567', data.problem) // 불편했던 경험
         if (data.card) formData.set('entry.XXXXXXXXX', data.card) // 발명 카드
-        if (data.description) formData.set('entry.399385104', data.description) // 발명 아이디어 설명
+        if (data.description) formData.set('entry.399385104', data.description) // 나만의 발명아이디어
         // 그림은 아래에서 처리
       } else if (level === '3') {
         // Level 3 entry 번호 설정
         formData.set('entry.XXXXXXXXX', '3') // 레벨 (Level 3)
-        if (data.teamMembers) formData.set('entry.114543920', data.teamMembers) // 모둠 친구들 이름
-        if (data.description) formData.set('entry.1497466334', data.description) // 발명 아이디어 설명
+        if (data.teamMembers) formData.set('entry.114543920', data.teamMembers) // 모둠원 입력
+        if (data.description) formData.set('entry.1497466334', data.description) // 발명 설명
         // 그림은 아래에서 처리
       }
 
@@ -358,7 +358,7 @@ function initApp() {
           } else if (level === '2') {
             formData.append('entry.1046076771', file, fileName) // Level 2 그림 entry 번호
           } else if (level === '3') {
-            formData.append('entry.395333856', file, fileName) // Level 3 그림 entry 번호
+            formData.append('entry.395333856', file, fileName) // Level 3 아이디어 스캐치
           }
         } catch (error) {
           console.error('그림 변환 오류:', error)
