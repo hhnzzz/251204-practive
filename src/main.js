@@ -7,37 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 function initApp() {
-  const steps = Array.from(document.querySelectorAll('.step'))
-  let currentStepIndex = 0
+  let currentLevel = null
+  let currentStep = 'level-select'
+  let l2_currentCard = ''
+  let l2_isGachaSpinning = false
 
-  const studentNumberInput = document.getElementById('studentNumber')
-  const studentNameInput = document.getElementById('studentName')
-  const problemTextInput = document.getElementById('problemText')
-  const ideaTextInput = document.getElementById('ideaText')
-
-  const cardDisplay = document.getElementById('inventionCardDisplay')
-  const drawCardBtn = document.getElementById('drawCardBtn')
-  const redrawCardBtn = document.getElementById('redrawCardBtn')
-  const toStep4Btn = document.getElementById('toStep4Btn')
-  const gachaSlot = document.getElementById('gachaSlot')
-  const gachaResult = document.getElementById('gachaResult')
-
-  const summaryProblem = document.getElementById('summaryProblem')
-  const summaryCard = document.getElementById('summaryCard')
-
-  // 구글 폼으로 보낼 숨겨진 필드들
-  const gfStudentNumber = document.getElementById('gf_studentNumber')
-  const gfStudentName = document.getElementById('gf_studentName')
-  const gfProblemText = document.getElementById('gf_problemText')
-  const gfInventionCard = document.getElementById('gf_inventionCard')
-  const gfIdeaText = document.getElementById('gf_ideaText')
-  const gfSketchImage = document.getElementById('gf_sketchImage')
-
-  const googleForm = document.getElementById('googleForm')
-  const submitBtn = document.getElementById('submitBtn')
-  const postSubmitMessage = document.getElementById('postSubmitMessage')
-
-  // 발명 카드 종류
   const inventionCards = [
     '1. 더하기',
     '2. 빼기',
@@ -51,63 +25,83 @@ function initApp() {
     '10. 폐품 활용하기',
   ]
 
-  let currentCard = ''
-  let isGachaSpinning = false
-
-  function showStep(index) {
-    steps.forEach((step, i) => {
-      if (i === index) {
-        step.classList.add('step-active')
-      } else {
-        step.classList.remove('step-active')
-      }
+  // 레벨 선택 이벤트 리스너 추가
+  document.querySelectorAll('.level-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      currentLevel = card.dataset.level
+      showStep(`level${currentLevel}-1`)
     })
-    currentStepIndex = index
+  })
 
-    // 4단계에 들어갈 때, 요약 상자와 구글 폼 숨김 필드 값을 갱신
-    if (index === 3) {
-      const problem = problemTextInput.value.trim()
-      const card = currentCard || '아직 카드를 뽑지 않았어요.'
+  // 레벨 선택으로 돌아가기
+  document.querySelectorAll('[data-back-to-select]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      showStep('level-select')
+      currentLevel = null
+    })
+  })
 
-      summaryProblem.textContent = problem || '아직 작성한 내용이 없어요.'
-      summaryCard.textContent = card
+  // 단계 전환 함수
+  function showStep(stepName) {
+    document.querySelectorAll('.step').forEach((step) => {
+      step.classList.remove('step-active')
+    })
+    const targetStep = document.querySelector(`[data-step="${stepName}"]`)
+    if (targetStep) {
+      targetStep.classList.add('step-active')
+      currentStep = stepName
 
-      gfStudentNumber.value = studentNumberInput.value.trim()
-      gfStudentName.value = studentNameInput.value.trim()
-      gfProblemText.value = problem
-      gfInventionCard.value = card
-      gfIdeaText.value = ideaTextInput.value.trim()
+      // Level 2-4 진입 시 요약 업데이트
+      if (stepName === 'level2-4') {
+        const problem = document.getElementById('l2_problemText')?.value.trim()
+        const card = l2_currentCard || '아직 카드를 뽑지 않았어요.'
+        const summaryProblem = document.getElementById('l2_summaryProblem')
+        const summaryCard = document.getElementById('l2_summaryCard')
+        if (summaryProblem) summaryProblem.textContent = problem || '아직 작성한 내용이 없어요.'
+        if (summaryCard) summaryCard.textContent = card
+      }
     }
   }
 
-  // 이전/다음 버튼 처리
+  // 다음 버튼 처리
   document.querySelectorAll('[data-next]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault()
       e.stopPropagation()
-      if (currentStepIndex < steps.length - 1) {
-        showStep(currentStepIndex + 1)
+      const currentStepEl = document.querySelector('.step-active')
+      if (!currentStepEl) return
+      
+      const steps = Array.from(document.querySelectorAll(`[data-level="${currentLevel}"]`))
+      const currentIndex = steps.indexOf(currentStepEl)
+      if (currentIndex < steps.length - 1) {
+        showStep(steps[currentIndex + 1].dataset.step)
       }
     })
   })
 
+  // 이전 버튼 처리
   document.querySelectorAll('[data-prev]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault()
       e.stopPropagation()
-      if (currentStepIndex > 0) {
-        showStep(currentStepIndex - 1)
+      const currentStepEl = document.querySelector('.step-active')
+      if (!currentStepEl) return
+      
+      const steps = Array.from(document.querySelectorAll(`[data-level="${currentLevel}"]`))
+      const currentIndex = steps.indexOf(currentStepEl)
+      if (currentIndex > 0) {
+        showStep(steps[currentIndex - 1].dataset.step)
       }
     })
   })
 
-  // 가챠 슬롯 머신 초기화
-  function initGachaSlot() {
+  // Level 2 가챠 초기화
+  function initL2Gacha() {
+    const gachaSlot = document.getElementById('l2_gachaSlot')
     if (!gachaSlot) return
     gachaSlot.innerHTML = ''
     gachaSlot.style.transform = 'translateY(0)'
     gachaSlot.style.transition = 'none'
-    // 카드를 여러 번 복제해서 무한 스크롤 효과
     for (let i = 0; i < 5; i++) {
       inventionCards.forEach((card) => {
         const item = document.createElement('div')
@@ -118,28 +112,32 @@ function initApp() {
     }
   }
 
-  // 발명 카드 뽑기 (가챠 효과)
-  function drawRandomCard() {
-    if (isGachaSpinning) return
+  // Level 2 카드 뽑기
+  function drawL2Card() {
+    if (l2_isGachaSpinning) return
+    l2_isGachaSpinning = true
 
-    isGachaSpinning = true
-    drawCardBtn.disabled = true
-    redrawCardBtn.disabled = true
-    toStep4Btn.disabled = true
+    const gachaSlot = document.getElementById('l2_gachaSlot')
+    const cardDisplay = document.getElementById('l2_inventionCardDisplay')
+    const drawBtn = document.getElementById('l2_drawCardBtn')
+    const redrawBtn = document.getElementById('l2_redrawCardBtn')
+    const nextBtn = document.getElementById('l2_toNextBtn')
 
-    // 슬롯 머신 시작
+    if (!gachaSlot || !cardDisplay || !drawBtn) return
+
+    drawBtn.disabled = true
+    if (redrawBtn) redrawBtn.disabled = true
+    if (nextBtn) nextBtn.disabled = true
+
     gachaSlot.classList.add('spinning')
-    gachaResult.classList.remove('show')
+    const gachaResult = document.getElementById('l2_gachaResult')
+    if (gachaResult) gachaResult.classList.remove('show')
     cardDisplay.textContent = ''
 
-    // 랜덤 카드 선택
     const randomIndex = Math.floor(Math.random() * inventionCards.length)
-    currentCard = inventionCards[randomIndex]
-
-    // 1.5~2.5초 후 멈춤
+    l2_currentCard = inventionCards[randomIndex]
     const spinDuration = 1500 + Math.random() * 1000
 
-    // 스핀 애니메이션 시작
     let spinOffset = 0
     const spinInterval = setInterval(() => {
       spinOffset -= 80
@@ -148,234 +146,361 @@ function initApp() {
 
     setTimeout(() => {
       clearInterval(spinInterval)
-      
-      // 슬롯 멈춤
       gachaSlot.classList.remove('spinning')
-      
-      // 선택된 카드로 슬롯 위치 조정 (중앙 정렬)
-      const targetIndex = randomIndex + inventionCards.length * 2 // 세 번째 세트에서 선택
+      const targetIndex = randomIndex + inventionCards.length * 2
       const targetPosition = -(targetIndex * 80)
       gachaSlot.style.transform = `translateY(${targetPosition}px)`
       gachaSlot.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
 
-      // 결과 표시
       setTimeout(() => {
-        cardDisplay.textContent = `오늘의 발명 카드: "${currentCard}"`
-        gachaResult.classList.add('show')
-        
-        // 드라마틱한 카드 연출
+        cardDisplay.textContent = `오늘의 발명 카드: "${l2_currentCard}"`
+        if (gachaResult) gachaResult.classList.add('show')
         cardDisplay.classList.remove('card-animate')
         void cardDisplay.offsetWidth
         cardDisplay.classList.add('card-animate')
 
-        isGachaSpinning = false
-        drawCardBtn.disabled = false
-        redrawCardBtn.disabled = false
-        toStep4Btn.disabled = false
+        l2_isGachaSpinning = false
+        drawBtn.disabled = false
+        if (redrawBtn) redrawBtn.disabled = false
+        if (nextBtn) nextBtn.disabled = false
       }, 500)
     }, spinDuration)
   }
 
-  if (drawCardBtn) {
-    drawCardBtn.addEventListener('click', drawRandomCard)
+  // Level 2 가챠 버튼 이벤트
+  const l2DrawBtn = document.getElementById('l2_drawCardBtn')
+  const l2RedrawBtn = document.getElementById('l2_redrawCardBtn')
+  if (l2DrawBtn) {
+    l2DrawBtn.addEventListener('click', drawL2Card)
   }
-
-  if (redrawCardBtn) {
-    redrawCardBtn.addEventListener('click', () => {
-      initGachaSlot()
-      drawRandomCard()
+  if (l2RedrawBtn) {
+    l2RedrawBtn.addEventListener('click', () => {
+      initL2Gacha()
+      drawL2Card()
     })
   }
+  initL2Gacha()
 
-  // 가챠 슬롯 초기화
-  initGachaSlot()
+  // 그림판 초기화 함수 (모든 레벨 공통)
+  function initSketch(canvas, colorInput, sizeInput, sizeLabel, clearBtn, toolBtns, dataInput) {
+    if (!canvas) return null
 
-  // 아이디어 텍스트가 바뀔 때마다 구글 폼 숨김 필드에도 반영
-  if (ideaTextInput) {
-    ideaTextInput.addEventListener('input', () => {
-      gfIdeaText.value = ideaTextInput.value.trim()
-    })
-  }
+    const ctx = canvas.getContext('2d')
+    let isDrawing = false
+    let currentTool = 'pen'
 
-  // 그림판 기능 초기화
-  const sketchCanvas = document.getElementById('sketchCanvas')
-  const sketchColorInput = document.getElementById('sketchColor')
-  const sketchSizeInput = document.getElementById('sketchSize')
-  const sketchSizeLabel = document.getElementById('sketchSizeLabel')
-  const clearSketchBtn = document.getElementById('clearSketch')
-  const sketchToolBtns = document.querySelectorAll('.sketch-tool-btn')
-
-  let isDrawing = false
-  let currentTool = 'pen'
-  let ctx = null
-
-  if (sketchCanvas) {
-    ctx = sketchCanvas.getContext('2d')
-    
-    // 캔버스 크기 조정 (반응형)
     function resizeCanvas() {
-      const container = sketchCanvas.parentElement
+      const container = canvas.parentElement
       const maxWidth = container.clientWidth - 20
       const aspectRatio = 600 / 400
-      sketchCanvas.style.width = `${maxWidth}px`
-      sketchCanvas.style.height = `${maxWidth / aspectRatio}px`
+      canvas.style.width = `${maxWidth}px`
+      canvas.style.height = `${maxWidth / aspectRatio}px`
     }
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
 
-    // 그리기 시작
     function startDrawing(e) {
       isDrawing = true
-      const rect = sketchCanvas.getBoundingClientRect()
-      const scaleX = sketchCanvas.width / rect.width
-      const scaleY = sketchCanvas.height / rect.height
-      
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
       const x = (e.clientX || e.touches[0].clientX) - rect.left
       const y = (e.clientY || e.touches[0].clientY) - rect.top
-      
       ctx.beginPath()
       ctx.moveTo(x * scaleX, y * scaleY)
-      saveSketchToForm()
+      saveSketch()
     }
 
-    // 그리기 중
     function draw(e) {
       if (!isDrawing) return
       e.preventDefault()
-      
-      const rect = sketchCanvas.getBoundingClientRect()
-      const scaleX = sketchCanvas.width / rect.width
-      const scaleY = sketchCanvas.height / rect.height
-      
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
       const x = (e.clientX || e.touches[0].clientX) - rect.left
       const y = (e.clientY || e.touches[0].clientY) - rect.top
-      
+
       if (currentTool === 'pen') {
-        ctx.strokeStyle = sketchColorInput.value
-        ctx.lineWidth = parseInt(sketchSizeInput.value)
-        ctx.lineCap = 'round'
-        ctx.lineJoin = 'round'
+        ctx.strokeStyle = colorInput.value
+        ctx.lineWidth = parseInt(sizeInput.value)
       } else if (currentTool === 'eraser') {
         ctx.strokeStyle = '#ffffff'
-        ctx.lineWidth = parseInt(sketchSizeInput.value) * 2
-        ctx.lineCap = 'round'
-        ctx.lineJoin = 'round'
+        ctx.lineWidth = parseInt(sizeInput.value) * 2
       }
-      
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
       ctx.lineTo(x * scaleX, y * scaleY)
       ctx.stroke()
-      saveSketchToForm()
+      saveSketch()
     }
 
-    // 그리기 종료
     function stopDrawing() {
       if (isDrawing) {
         isDrawing = false
-        saveSketchToForm()
+        saveSketch()
       }
     }
 
-    // 마우스 이벤트
-    sketchCanvas.addEventListener('mousedown', startDrawing)
-    sketchCanvas.addEventListener('mousemove', draw)
-    sketchCanvas.addEventListener('mouseup', stopDrawing)
-    sketchCanvas.addEventListener('mouseout', stopDrawing)
+    function saveSketch() {
+      if (dataInput && canvas) {
+        const dataURL = canvas.toDataURL('image/png')
+        dataInput.value = dataURL
+      }
+    }
 
-    // 터치 이벤트
-    sketchCanvas.addEventListener('touchstart', (e) => {
+    canvas.addEventListener('mousedown', startDrawing)
+    canvas.addEventListener('mousemove', draw)
+    canvas.addEventListener('mouseup', stopDrawing)
+    canvas.addEventListener('mouseout', stopDrawing)
+    canvas.addEventListener('touchstart', (e) => {
       e.preventDefault()
       startDrawing(e)
     })
-    sketchCanvas.addEventListener('touchmove', (e) => {
+    canvas.addEventListener('touchmove', (e) => {
       e.preventDefault()
       draw(e)
     })
-    sketchCanvas.addEventListener('touchend', stopDrawing)
-    sketchCanvas.addEventListener('touchcancel', stopDrawing)
+    canvas.addEventListener('touchend', stopDrawing)
+    canvas.addEventListener('touchcancel', stopDrawing)
 
-    // 선 두께 표시 업데이트
-    if (sketchSizeInput && sketchSizeLabel) {
-      sketchSizeInput.addEventListener('input', () => {
-        sketchSizeLabel.textContent = `${sketchSizeInput.value}px`
+    if (sizeInput && sizeLabel) {
+      sizeInput.addEventListener('input', () => {
+        sizeLabel.textContent = `${sizeInput.value}px`
       })
     }
 
-    // 도구 선택
-    sketchToolBtns.forEach((btn) => {
+    toolBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        sketchToolBtns.forEach((b) => b.classList.remove('active'))
+        toolBtns.forEach((b) => b.classList.remove('active'))
         btn.classList.add('active')
         currentTool = btn.dataset.tool
       })
     })
 
-    // 전체 지우기
-    if (clearSketchBtn) {
-      clearSketchBtn.addEventListener('click', () => {
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
         if (confirm('그림을 모두 지우시겠어요?')) {
-          ctx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height)
-          saveSketchToForm()
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
+          saveSketch()
         }
       })
     }
 
-    // 그림을 base64로 변환하여 폼에 저장
-    function saveSketchToForm() {
-      if (gfSketchImage && sketchCanvas) {
-        const dataURL = sketchCanvas.toDataURL('image/png')
-        gfSketchImage.value = dataURL
-      }
-    }
+    return { saveSketch }
   }
 
-  // 구글 폼 전송 (fetch + no-cors)
-  if (googleForm) {
-    googleForm.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      e.stopPropagation()
+  // 각 레벨별 그림판 초기화
+  document.querySelectorAll('.sketch-container').forEach((container) => {
+    const canvas = container.querySelector('.sketch-canvas')
+    const colorInput = container.querySelector('.sketch-color')
+    const sizeInput = container.querySelector('.sketch-size')
+    const sizeLabel = container.querySelector('.sketch-size-label')
+    const clearBtn = container.querySelector('.clear-sketch')
+    const toolBtns = container.querySelectorAll('.sketch-tool-btn')
+    const dataInput = container.parentElement.querySelector('.sketch-image-data')
 
-      const formUrl = googleForm.action
-      const num = studentNumberInput.value.trim()
-      const name = studentNameInput.value.trim()
-      const problem = problemTextInput.value.trim()
-      const idea = ideaTextInput.value.trim()
-      const card = currentCard
+    if (canvas) {
+      initSketch(canvas, colorInput, sizeInput, sizeLabel, clearBtn, toolBtns, dataInput)
+    }
+  })
 
-      // 숨겨진 필드 동기화
-      gfStudentNumber.value = num
-      gfStudentName.value = name
-      gfProblemText.value = problem
-      gfIdeaText.value = idea
-      gfInventionCard.value = card
-
+  // 제출 처리 함수
+  async function submitLevel(level, data) {
+    // 구글 폼 전송
+    const form = document.getElementById('googleForm')
+    if (form) {
       const formData = new FormData()
-      formData.set('entry.670944922', num) // 번호
-      formData.set('entry.260370643', name) // 이름
-      formData.set('entry.1436421567', problem) // 불편했던 경험
-      formData.set('entry.399385104', idea) // 아이디어
-      formData.set('inventionCard', card) // 참고용
+      
+      // 레벨별 entry 번호 설정
+      // ⚠️ 아래 entry 번호들을 실제 구글 폼의 entry 번호로 변경하세요!
+      
+      if (level === '1') {
+        // Level 1 entry 번호 설정
+        formData.set('entry.XXXXXXXXX', '1') // 레벨 (Level 1)
+        if (data.number) formData.set('entry.1465581057', data.number) // 번호
+        if (data.name) formData.set('entry.842649084', data.name) // 이름
+        if (data.description) formData.set('entry.1925242', data.description) // 발명 설명
+        // 그림은 아래에서 처리
+      } else if (level === '2') {
+        // Level 2 entry 번호 설정
+        formData.set('entry.XXXXXXXXX', '2') // 레벨 (Level 2)
+        if (data.number) formData.set('entry.1046076771', data.number) // 번호
+        if (data.name) formData.set('entry.260370643', data.name) // 이름
+        if (data.problem) formData.set('entry.1436421567', data.problem) // 불편했던 경험
+        if (data.card) formData.set('entry.XXXXXXXXX', data.card) // 발명 카드
+        if (data.description) formData.set('entry.399385104', data.description) // 발명 아이디어 설명
+        // 그림은 아래에서 처리
+      } else if (level === '3') {
+        // Level 3 entry 번호 설정
+        formData.set('entry.XXXXXXXXX', '3') // 레벨 (Level 3)
+        if (data.teamMembers) formData.set('entry.114543920', data.teamMembers) // 모둠 친구들 이름
+        if (data.description) formData.set('entry.1497466334', data.description) // 발명 아이디어 설명
+        // 그림은 아래에서 처리
+      }
+
+      // 그림 데이터
+      if (data.sketch) {
+        try {
+          const base64Data = data.sketch.split(',')[1]
+          const byteCharacters = atob(base64Data)
+          const byteNumbers = new Array(byteCharacters.length)
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i)
+          }
+          const byteArray = new Uint8Array(byteNumbers)
+          const blob = new Blob([byteArray], { type: 'image/png' })
+          const fileName = `발명_Level${level}_${data.name || data.teamMembers || '학생'}_${Date.now()}.png`
+          const file = new File([blob], fileName, { type: 'image/png' })
+          
+          // 그림 파일 업로드 entry 번호 (레벨별로 다를 수 있음)
+          if (level === '1') {
+            formData.append('entry.781929115', file, fileName) // Level 1 그림 entry 번호
+          } else if (level === '2') {
+            formData.append('entry.1046076771', file, fileName) // Level 2 그림 entry 번호
+          } else if (level === '3') {
+            formData.append('entry.395333856', file, fileName) // Level 3 그림 entry 번호
+          }
+        } catch (error) {
+          console.error('그림 변환 오류:', error)
+        }
+      }
 
       try {
-        await fetch(formUrl, {
+        await fetch(form.action, {
           method: 'POST',
-          mode: 'no-cors', // 요청은 보내지지만 응답은 Opaque
+          mode: 'no-cors',
           body: formData,
         })
-        if (submitBtn) {
-          submitBtn.disabled = true
-          submitBtn.textContent = '전송 완료!'
-        }
-        if (postSubmitMessage) {
-          postSubmitMessage.classList.remove('hidden')
-        }
-        alert('선생님께 잘 제출되었습니다!')
       } catch (err) {
-        console.error(err)
-        alert('전송 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.')
+        console.error('구글 폼 전송 오류:', err)
       }
+    }
+
+    // 로컬 스토리지에 저장 (나중에 API로 교체 가능)
+    const submissions = JSON.parse(localStorage.getItem(`submissions_level${level}`) || '[]')
+    submissions.push({
+      ...data,
+      timestamp: new Date().toISOString(),
     })
+    localStorage.setItem(`submissions_level${level}`, JSON.stringify(submissions))
+    
+    return true
   }
 
-  // 첫 화면 표시
-  showStep(0)
-} // initApp 함수 종료
+  // Level 1 제출
+  document.getElementById('l1_submitBtn')?.addEventListener('click', async () => {
+    const number = document.getElementById('l1_studentNumber')?.value.trim()
+    const name = document.getElementById('l1_studentName')?.value.trim()
+    const description = document.getElementById('l1_description')?.value.trim()
+    const sketch = document.querySelector('[data-step="level1-2"] .sketch-image-data')?.value
+
+    if (!number || !name || !description) {
+      alert('모든 항목을 입력해주세요.')
+      return
+    }
+
+    const success = await submitLevel('1', { number, name, description, sketch })
+    if (success) {
+      showStep('level1-3')
+      loadSubmissions('l1_submissions', '1')
+    } else {
+      alert('제출 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.')
+    }
+  })
+
+  // Level 2 제출
+  document.getElementById('l2_submitBtn')?.addEventListener('click', async () => {
+    const number = document.getElementById('l2_studentNumber')?.value.trim()
+    const name = document.getElementById('l2_studentName')?.value.trim()
+    const problem = document.getElementById('l2_problemText')?.value.trim()
+    const description = document.getElementById('l2_description')?.value.trim()
+    const sketch = document.querySelector('[data-step="level2-4"] .sketch-image-data')?.value
+
+    if (!number || !name || !problem || !description || !l2_currentCard) {
+      alert('모든 항목을 입력하고 카드를 뽑아주세요.')
+      return
+    }
+
+    const success = await submitLevel('2', { number, name, problem, card: l2_currentCard, description, sketch })
+    if (success) {
+      showStep('level2-5')
+      loadSubmissions('l2_submissions', '2')
+    } else {
+      alert('제출 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.')
+    }
+  })
+
+  // Level 3 제출
+  document.getElementById('l3_submitBtn')?.addEventListener('click', async () => {
+    const teamMembers = document.getElementById('l3_teamMembers')?.value.trim()
+    const description = document.getElementById('l3_description')?.value.trim()
+    const sketch = document.querySelector('[data-step="level3-3"] .sketch-image-data')?.value
+
+    if (!teamMembers || !description) {
+      alert('모든 항목을 입력해주세요.')
+      return
+    }
+
+    const success = await submitLevel('3', { teamMembers, description, sketch })
+    if (success) {
+      showStep('level3-4')
+      loadSubmissions('l3_submissions', '3')
+    } else {
+      alert('제출 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.')
+    }
+  })
+
+  // 다른 학생들 제출 내용 불러오기
+  function loadSubmissions(containerId, level) {
+    const container = document.getElementById(containerId)
+    if (!container) return
+
+    // 현재는 로컬 스토리지에서 불러오기 (나중에 API로 교체)
+    const submissions = JSON.parse(localStorage.getItem(`submissions_level${level}`) || '[]')
+    
+    // 자신의 제출은 제외하고 표시
+    const otherSubmissions = submissions.slice(0, -1).reverse() // 최신순, 자신 제외
+    
+    if (otherSubmissions.length === 0) {
+      container.innerHTML = '<p class="no-submissions">아직 다른 친구들의 제출 내용이 없어요. 첫 번째가 되세요! 🎉</p>'
+      return
+    }
+
+    container.innerHTML = otherSubmissions.map((sub, index) => {
+      let content = `<div class="submission-item">
+        <div class="submission-header">
+          <span class="submission-number">#${index + 1}</span>`
+      
+      if (level === '1') {
+        content += `<span class="submission-name">${sub.name || sub.number || '익명'}</span>`
+      } else if (level === '2') {
+        content += `<span class="submission-name">${sub.name || sub.number || '익명'}</span>`
+        if (sub.card) {
+          content += `<div class="submission-card">발명 카드: ${sub.card}</div>`
+        }
+      } else if (level === '3') {
+        content += `<span class="submission-name">모둠: ${sub.teamMembers || '익명'}</span>`
+      }
+      
+      content += `</div>`
+      
+      // 그림 표시
+      if (sub.sketch) {
+        content += `<div class="submission-sketch"><img src="${sub.sketch}" alt="발명 스케치" /></div>`
+      }
+      
+      // 설명 표시
+      if (sub.description) {
+        content += `<div class="submission-description">${sub.description.replace(/\n/g, '<br>')}</div>`
+      }
+      
+      // Level 2의 경우 불편했던 경험도 표시
+      if (level === '2' && sub.problem) {
+        content += `<div class="submission-problem"><strong>불편했던 경험:</strong> ${sub.problem}</div>`
+      }
+      
+      content += `</div>`
+      return content
+    }).join('')
+  }
+}

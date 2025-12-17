@@ -3,56 +3,158 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>재밌고 쉬운 발명의 세계</title>
+    <title>신나고 재밌는 발명의 세계</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
     <div class="app-container">
-      <!-- 1단계: 기본 정보 입력 -->
-      <section class="step step-active" data-step="1">
+      <!-- 레벨 선택 화면 -->
+      <section class="step step-active" data-step="level-select">
         <header class="app-header">
-          <h1>두근두근 재밌는 발명의 세계</h1>
+          <h1>신나고 재밌는 발명의 세계</h1>
           <div class="header-visual">
-            <img src="/fun.jpg" alt="두근두근 재밌는 발명의 세계" />
+            <img src="/fun.jpg" alt="신나고 재밌는 발명의 세계" />
           </div>
-          <p class="subtitle">나만의 기발한 발명 아이디어를 떠올려 볼까?</p>
+          <p class="subtitle">원하는 단계를 선택해서 활동을 시작해 보세요!</p>
         </header>
-        <div class="card">
-          <h2>1단계. 나를 소개해요</h2>
-          <div class="form-group">
-            <label for="studentNumber">번호</label>
-            <input id="studentNumber" name="studentNumber" type="text" placeholder="예) 5번" />
+        <div class="level-selection">
+          <div class="level-card" data-level="1">
+            <div class="level-badge">Level 1</div>
+            <h2>더 불편하게 만드는 발명</h2>
+            <p>일상생활에서 불편했던 물건을 더 불편하게 만들어봅시다</p>
+            <div class="level-icon">🌟</div>
           </div>
-          <div class="form-group">
-            <label for="studentName">이름</label>
-            <input id="studentName" name="studentName" type="text" placeholder="예) 홍길동" />
+          <div class="level-card" data-level="2">
+            <div class="level-badge">Level 2</div>
+            <h2>발명 카드로 발명하기</h2>
+            <p>불편함과 발명 카드를 연결해서 발명을 해봅시다</p>
+            <div class="level-icon">🚀</div>
           </div>
-          <div class="actions">
-            <button class="btn primary" data-next>다음 단계로 가기</button>
+          <div class="level-card" data-level="3">
+            <div class="level-badge">Level 3</div>
+            <h2>협력해서 발명하기</h2>
+            <p>모둠 친구들과 함께 문제를 해결해봅시다</p>
+            <div class="level-icon">💡</div>
           </div>
         </div>
       </section>
 
-      <!-- 2단계: 불편했던 물건/경험 -->
-      <section class="step" data-step="2">
+      <!-- Level 1: 더 불편하게 만드는 발명 -->
+      <!-- Level 1-1: 이름/번호 입력 -->
+      <section class="step" data-step="level1-1" data-level="1">
         <header class="app-header">
-          <h1>일상 속 불편함 찾기</h1>
-          <p class="subtitle">작은 불편함이 멋진 발명의 씨앗이 돼요.</p>
+          <h1>Level 1: 더 불편하게 만드는 발명</h1>
         </header>
         <div class="card">
-          <h2>2단계. 무엇이 불편했나요?</h2>
+          <h2>나를 소개해요</h2>
+          <div class="form-group">
+            <label for="l1_studentNumber">번호</label>
+            <input id="l1_studentNumber" type="text" placeholder="예) 5번" />
+          </div>
+          <div class="form-group">
+            <label for="l1_studentName">이름</label>
+            <input id="l1_studentName" type="text" placeholder="예) 홍길동" />
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-back-to-select>레벨 선택으로</button>
+            <button class="btn primary" data-next>다음</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Level 1-2: 그림 + 설명 -->
+      <section class="step" data-step="level1-2" data-level="1">
+        <header class="app-header">
+          <h1>Level 1: 더 불편하게 만드는 발명</h1>
+        </header>
+        <div class="card">
+          <h2>발명하기</h2>
           <p class="question">
-            일상에서 사용하다가 <strong>불편했던 물건</strong>은 무엇인가요?<br />
-            또는 <strong>불편했던 경험</strong>은 무엇인가요?
+            일상생활에서 불편했던 물건을 더 불편하게 만들어봅시다.
           </p>
           <div class="form-group">
-            <label for="problemText">불편했던 물건 또는 경험을 적어 보세요.</label>
-            <textarea
-              id="problemText"
-              name="problemText"
-              rows="5"
-              placeholder="예) 가방 속 물건이 너무 뒤죽박죽 섞여서 매번 찾기 힘들어요."
-            ></textarea>
+            <label>발명 아이디어 스케치하기</label>
+            <div class="sketch-container">
+              <div class="sketch-toolbar">
+                <div class="sketch-tools">
+                  <button type="button" class="sketch-tool-btn active" data-tool="pen" title="펜">✏️</button>
+                  <button type="button" class="sketch-tool-btn" data-tool="eraser" title="지우개">🧹</button>
+                  <input type="color" class="sketch-color" value="#000000" title="색상 선택" />
+                  <input type="range" class="sketch-size" min="1" max="20" value="3" title="선 두께" />
+                  <span class="sketch-size-label">3px</span>
+                  <button type="button" class="sketch-tool-btn clear-sketch" title="전체 지우기">🗑️</button>
+                </div>
+              </div>
+              <canvas class="sketch-canvas" width="600" height="400"></canvas>
+            </div>
+            <input type="hidden" class="sketch-image-data" />
+          </div>
+          <div class="form-group">
+            <label for="l1_description">발명 설명</label>
+            <textarea id="l1_description" rows="5" placeholder="발명한 물건에 대해 설명해주세요."></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-prev>이전</button>
+            <button class="btn primary" id="l1_submitBtn">제출하기</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Level 1-3: 제출 완료 + 다른 학생들 제출 내용 -->
+      <section class="step" data-step="level1-3" data-level="1">
+        <header class="app-header">
+          <h1>참 잘했어요! 👏</h1>
+        </header>
+        <div class="card">
+          <div class="success-message">
+            <p class="encourage">멋진 발명 아이디어를 제출해주셔서 감사합니다!</p>
+          </div>
+          <div class="submissions-section">
+            <h3>다른 친구들의 발명 아이디어</h3>
+            <div id="l1_submissions" class="submissions-list">
+              <p class="loading-text">다른 친구들의 아이디어를 불러오는 중...</p>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn primary" data-back-to-select>다른 레벨 하기</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Level 2: 발명 카드로 발명하기 -->
+      <!-- Level 2-1: 이름/번호 입력 -->
+      <section class="step" data-step="level2-1" data-level="2">
+        <header class="app-header">
+          <h1>Level 2: 발명 카드로 발명하기</h1>
+        </header>
+        <div class="card">
+          <h2>나를 소개해요</h2>
+          <div class="form-group">
+            <label for="l2_studentNumber">번호</label>
+            <input id="l2_studentNumber" type="text" placeholder="예) 5번" />
+          </div>
+          <div class="form-group">
+            <label for="l2_studentName">이름</label>
+            <input id="l2_studentName" type="text" placeholder="예) 홍길동" />
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-back-to-select>레벨 선택으로</button>
+            <button class="btn primary" data-next>다음</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Level 2-2: 불편했던 경험 -->
+      <section class="step" data-step="level2-2" data-level="2">
+        <header class="app-header">
+          <h1>Level 2: 발명 카드로 발명하기</h1>
+        </header>
+        <div class="card">
+          <h2>불편했던 경험</h2>
+          <p class="question">일상에서 불편했던 경험을 적어봅시다.</p>
+          <div class="form-group">
+            <label for="l2_problemText">불편했던 경험을 적어 보세요.</label>
+            <textarea id="l2_problemText" rows="5" placeholder="예) 가방 속 물건이 너무 뒤죽박죽 섞여서 매번 찾기 힘들어요."></textarea>
           </div>
           <div class="actions">
             <button class="btn ghost" data-prev>이전</button>
@@ -61,157 +163,206 @@
         </div>
       </section>
 
-      <!-- 3단계: 발명 카드 뽑기 -->
-      <section class="step" data-step="3">
+      <!-- Level 2-3: 발명 카드 뽑기 -->
+      <section class="step" data-step="level2-3" data-level="2">
         <header class="app-header">
-          <h1>발명 카드 뽑기</h1>
-          <p class="subtitle">카드가 알려주는 새로운 생각의 방법!</p>
+          <h1>Level 2: 발명 카드 뽑기</h1>
         </header>
         <div class="card">
-          <h2>3단계. 나의 발명 카드</h2>
+          <h2>나의 발명 카드</h2>
           <p class="question">버튼을 눌러 발명 카드를 뽑아 보세요. 마음에 안 들면 다시 뽑을 수 있어요.</p>
-
-          <!-- 가챠 슬롯 머신 효과 -->
           <div class="gacha-container">
-            <div class="gacha-slot" id="gachaSlot">
-              <div class="gacha-card-item">더하기</div>
-              <div class="gacha-card-item">빼기</div>
-              <div class="gacha-card-item">모양 바꾸기</div>
-              <div class="gacha-card-item">크게 또는 작게</div>
-              <div class="gacha-card-item">반대로 생각하기</div>
-              <div class="gacha-card-item">자연물 본뜨기</div>
-              <div class="gacha-card-item">용도 바꾸기</div>
-              <div class="gacha-card-item">재료 바꾸기</div>
-              <div class="gacha-card-item">남의 아이디어 빌리기</div>
-              <div class="gacha-card-item">폐품 활용하기</div>
-            </div>
-            <div class="gacha-result" id="gachaResult">
-              <div class="card-display" id="inventionCardDisplay">
-                아직 카드를 뽑지 않았어요.
-              </div>
+            <div class="gacha-slot" id="l2_gachaSlot"></div>
+            <div class="gacha-result" id="l2_gachaResult">
+              <div class="card-display" id="l2_inventionCardDisplay">아직 카드를 뽑지 않았어요.</div>
             </div>
           </div>
-
           <div class="card-buttons">
-            <button class="btn secondary" id="drawCardBtn">카드 뽑기</button>
-            <button class="btn ghost" id="redrawCardBtn" disabled>다시 뽑기</button>
+            <button class="btn secondary" id="l2_drawCardBtn">카드 뽑기</button>
+            <button class="btn ghost" id="l2_redrawCardBtn" disabled>다시 뽑기</button>
           </div>
-
-          <ul class="card-list-hint">
-            <li>더하기</li>
-            <li>빼기</li>
-            <li>모양 바꾸기</li>
-            <li>크게 또는 작게</li>
-            <li>반대로 생각하기</li>
-            <li>자연물 본뜨기</li>
-            <li>용도 바꾸기</li>
-            <li>재료 바꾸기</li>
-            <li>남의 아이디어 빌리기</li>
-            <li>폐품 활용하기</li>
-          </ul>
-
           <div class="actions">
             <button class="btn ghost" data-prev>이전</button>
-            <button class="btn primary" data-next id="toStep4Btn" disabled>아이디어 떠올리러 가기</button>
+            <button class="btn primary" data-next id="l2_toNextBtn" disabled>발명하기</button>
           </div>
         </div>
       </section>
 
-      <!-- 4단계: 아이디어 구상 + 구글 폼 전송 -->
-      <section class="step" data-step="4">
+      <!-- Level 2-4: 발명하기 (그림 + 설명) -->
+      <section class="step" data-step="level2-4" data-level="2">
         <header class="app-header">
-          <h1>발명 아이디어 구상하기</h1>
-          <p class="subtitle">조금 전 찾았던 불편함과 발명 카드를 잘 연결해 보세요.</p>
+          <h1>Level 2: 발명하기</h1>
         </header>
         <div class="card">
-          <h2>4단계. 나의 발명 아이디어</h2>
-
+          <h2>나의 발명 아이디어</h2>
           <div class="summary-box">
             <h3>내가 찾은 불편함</h3>
-            <p id="summaryProblem" class="summary-text">아직 작성한 내용이 없어요.</p>
-
+            <p id="l2_summaryProblem" class="summary-text">아직 작성한 내용이 없어요.</p>
             <h3>내가 뽑은 발명 카드</h3>
-            <p id="summaryCard" class="summary-text">아직 카드를 뽑지 않았어요.</p>
+            <p id="l2_summaryCard" class="summary-text">아직 카드를 뽑지 않았어요.</p>
           </div>
-
-          <div class="form-group">
-            <label for="ideaText">발명 아이디어 구상하기</label>
-            <textarea
-              id="ideaText"
-              name="ideaText"
-              rows="6"
-              placeholder="예) 가방 안에 여러 개의 투명 파우치를 넣어서, 물건 종류별로 나눠 보관할 수 있는 가방을 만든다. &#10;- 더하기 카드: 파우치들을 더해서 한 가방 안에 넣기!"
-            ></textarea>
-          </div>
-
           <div class="form-group">
             <label>발명 아이디어 스케치하기</label>
             <div class="sketch-container">
               <div class="sketch-toolbar">
                 <div class="sketch-tools">
-                  <button type="button" class="sketch-tool-btn active" data-tool="pen" title="펜">
-                    ✏️
-                  </button>
-                  <button type="button" class="sketch-tool-btn" data-tool="eraser" title="지우개">
-                    🧹
-                  </button>
-                  <input type="color" id="sketchColor" value="#000000" title="색상 선택" />
-                  <input type="range" id="sketchSize" min="1" max="20" value="3" title="선 두께" />
-                  <span class="sketch-size-label" id="sketchSizeLabel">3px</span>
-                  <button type="button" class="sketch-tool-btn" id="clearSketch" title="전체 지우기">
-                    🗑️
-                  </button>
+                  <button type="button" class="sketch-tool-btn active" data-tool="pen" title="펜">✏️</button>
+                  <button type="button" class="sketch-tool-btn" data-tool="eraser" title="지우개">🧹</button>
+                  <input type="color" class="sketch-color" value="#000000" title="색상 선택" />
+                  <input type="range" class="sketch-size" min="1" max="20" value="3" title="선 두께" />
+                  <span class="sketch-size-label">3px</span>
+                  <button type="button" class="sketch-tool-btn clear-sketch" title="전체 지우기">🗑️</button>
                 </div>
               </div>
-              <canvas id="sketchCanvas" width="600" height="400"></canvas>
+              <canvas class="sketch-canvas" width="600" height="400"></canvas>
             </div>
-            <input type="hidden" name="sketchImage" id="gf_sketchImage" />
+            <input type="hidden" class="sketch-image-data" />
           </div>
+          <div class="form-group">
+            <label for="l2_description">발명 아이디어 설명</label>
+            <textarea id="l2_description" rows="6" placeholder="불편했던 경험과 발명 카드를 연결해서 발명 아이디어를 설명해주세요."></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-prev>이전</button>
+            <button class="btn primary" id="l2_submitBtn">제출하기</button>
+          </div>
+        </div>
+      </section>
 
-          <p class="encourage">
-            여기까지 잘 해냈어요! 👏<br />
-            지금까지 정리한 내용을 선생님께 보내고,<br />
-            <strong>이제 진짜 발명을 시작해 볼까요?</strong>
-          </p>
-
-          <p class="encourage small">
-            작은 아이디어도 괜찮아요. <strong>틀려도 괜찮고, 엉뚱해도 괜찮아요.</strong><br />
-            여러분의 생각 하나하나가 세상을 더 편리하고 즐겁게 만들 수 있어요! 🌈
-          </p>
-
-          <!-- 실제 구글 폼 연동용 폼 -->
-          <!-- 아래 form의 action에 구글 폼 "응답 제출" URL을 넣어 주세요. -->
-          <!-- 각 input/textarea의 name 값을 구글 폼의 entry.xxx... 값에 맞게 바꾸면 됩니다. -->
-          <form
-            id="googleForm"
-            method="POST"
-            target="_self"
-            action="https://docs.google.com/forms/d/e/1FAIpQLSfVmtcR1Dvdh5MKjV8-nTIhdSG_IvfghoYWh956mOHny4w2pg/formResponse"
-          >
-            <!-- 실제로 전송될 숨겨진 필드들 (자바스크립트가 값 채움) -->
-            <input type="hidden" name="entry.670944922" id="gf_studentNumber" />
-            <input type="hidden" name="entry.260370643" id="gf_studentName" />
-            <input type="hidden" name="entry.1436421567" id="gf_problemText" />
-            <input type="hidden" name="inventionCard" id="gf_inventionCard" />
-            <input type="hidden" name="entry.399385104" id="gf_ideaText" />
-            <input type="hidden" name="sketchImage" id="gf_sketchImage" />
-
-            <div class="actions">
-              <button class="btn ghost" data-prev type="button">이전</button>
-              <button class="btn primary" type="submit" id="submitBtn">
-                선생님께 아이디어 보내기
-              </button>
+      <!-- Level 2-5: 제출 완료 + 다른 학생들 제출 내용 -->
+      <section class="step" data-step="level2-5" data-level="2">
+        <header class="app-header">
+          <h1>참 잘했어요! 👏</h1>
+        </header>
+        <div class="card">
+          <div class="success-message">
+            <p class="encourage">멋진 발명 아이디어를 제출해주셔서 감사합니다!</p>
+            <p class="encourage small">여러분의 창의적인 생각이 세상을 더 편리하게 만들 수 있어요! 🌈</p>
+          </div>
+          <div class="submissions-section">
+            <h3>다른 친구들의 발명 아이디어</h3>
+            <div id="l2_submissions" class="submissions-list">
+              <p class="loading-text">다른 친구들의 아이디어를 불러오는 중...</p>
             </div>
-          </form>
+          </div>
+          <div class="actions">
+            <button class="btn primary" data-back-to-select>다른 레벨 하기</button>
+          </div>
+        </div>
+      </section>
 
-          <p class="footer-message hidden" id="postSubmitMessage">
-            아이디어를 보낸 뒤에는, 지금 적은 내용을 바탕으로<br />
-            <strong>실제로 만들거나, 그림으로 그리거나, 모형으로 표현해 보아요!</strong><br />
-            선생님과 친구들이 여러분의 멋진 발명을 응원하고 있어요! 💡✨
-          </p>
+      <!-- Level 3: 협력해서 발명하기 -->
+      <!-- Level 3-1: 모둠 친구들 이름 입력 -->
+      <section class="step" data-step="level3-1" data-level="3">
+        <header class="app-header">
+          <h1>Level 3: 협력해서 발명하기</h1>
+        </header>
+        <div class="card">
+          <h2>모둠 친구들 소개</h2>
+          <p class="question">함께 발명할 모둠 친구들의 이름을 적어주세요.</p>
+          <div class="form-group">
+            <label for="l3_teamMembers">모둠 친구들 이름</label>
+            <textarea id="l3_teamMembers" rows="4" placeholder="예) 홍길동, 김철수, 이영희"></textarea>
+            <small class="form-hint">이름을 쉼표(,)로 구분해서 적어주세요.</small>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-back-to-select>레벨 선택으로</button>
+            <button class="btn primary" data-next>다음</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Level 3-2: 문제 상황 제시 -->
+      <section class="step" data-step="level3-2" data-level="3">
+        <header class="app-header">
+          <h1>Level 3: 문제 상황</h1>
+        </header>
+        <div class="card">
+          <h2>발명할 문제</h2>
+          <div class="problem-box">
+            <p class="problem-text">
+              선생님은 텀블러를 뚜껑 열고 사용하는 경우가 많은데, 자꾸 텀블러를 실수로 건들여서 커피를 쏟는 상황이 발생합니다.
+            </p>
+            <p class="problem-question">
+              <strong>뚜껑을 열어서 사용해도 커피가 쏟아지지 않는 텀블러를 발명해주세요!</strong>
+            </p>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-prev>이전</button>
+            <button class="btn primary" data-next>발명하기</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Level 3-3: 발명하기 (그림 + 설명) -->
+      <section class="step" data-step="level3-3" data-level="3">
+        <header class="app-header">
+          <h1>Level 3: 협력해서 발명하기</h1>
+        </header>
+        <div class="card">
+          <h2>우리의 발명 아이디어</h2>
+          <div class="form-group">
+            <label>발명 아이디어 스케치하기</label>
+            <div class="sketch-container">
+              <div class="sketch-toolbar">
+                <div class="sketch-tools">
+                  <button type="button" class="sketch-tool-btn active" data-tool="pen" title="펜">✏️</button>
+                  <button type="button" class="sketch-tool-btn" data-tool="eraser" title="지우개">🧹</button>
+                  <input type="color" class="sketch-color" value="#000000" title="색상 선택" />
+                  <input type="range" class="sketch-size" min="1" max="20" value="3" title="선 두께" />
+                  <span class="sketch-size-label">3px</span>
+                  <button type="button" class="sketch-tool-btn clear-sketch" title="전체 지우기">🗑️</button>
+                </div>
+              </div>
+              <canvas class="sketch-canvas" width="600" height="400"></canvas>
+            </div>
+            <input type="hidden" class="sketch-image-data" />
+          </div>
+          <div class="form-group">
+            <label for="l3_description">발명 아이디어 설명</label>
+            <textarea id="l3_description" rows="6" placeholder="모둠 친구들과 함께 발명한 텀블러에 대해 설명해주세요."></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" data-prev>이전</button>
+            <button class="btn primary" id="l3_submitBtn">제출하기</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Level 3-4: 제출 완료 + 다른 학생들 제출 내용 -->
+      <section class="step" data-step="level3-4" data-level="3">
+        <header class="app-header">
+          <h1>참 잘했어요! 👏</h1>
+        </header>
+        <div class="card">
+          <div class="success-message">
+            <p class="encourage">멋진 협력 발명 아이디어를 제출해주셔서 감사합니다!</p>
+            <p class="encourage small">여러분의 팀워크가 멋진 발명을 만들어냈어요! 🌟</p>
+          </div>
+          <div class="submissions-section">
+            <h3>다른 모둠들의 발명 아이디어</h3>
+            <div id="l3_submissions" class="submissions-list">
+              <p class="loading-text">다른 모둠들의 아이디어를 불러오는 중...</p>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn primary" data-back-to-select>다른 레벨 하기</button>
+          </div>
         </div>
       </section>
     </div>
+
+    <!-- 구글 폼 (숨김) - 나중에 entry 번호 수정 필요 -->
+    <form id="googleForm" method="POST" action="https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse" style="display: none;">
+      <input type="hidden" name="entry.XXXXXXXXX" id="gf_level" />
+      <input type="hidden" name="entry.XXXXXXXXX" id="gf_studentNumber" />
+      <input type="hidden" name="entry.XXXXXXXXX" id="gf_studentName" />
+      <input type="hidden" name="entry.XXXXXXXXX" id="gf_problemText" />
+      <input type="hidden" name="entry.XXXXXXXXX" id="gf_inventionCard" />
+      <input type="hidden" name="entry.XXXXXXXXX" id="gf_description" />
+      <input type="hidden" name="entry.XXXXXXXXX" id="gf_sketchImage" />
+      <input type="hidden" name="entry.XXXXXXXXX" id="gf_teamMembers" />
+    </form>
 
     <script type="module" src="/src/main.js"></script>
   </body>
