@@ -11,7 +11,10 @@
       <!-- 1단계: 기본 정보 입력 -->
       <section class="step step-active" data-step="1">
         <header class="app-header">
-          <h1>재밌고 쉬운 발명의 세계</h1>
+          <h1>두근두근 재밌는 발명의 세계</h1>
+          <div class="header-visual">
+            <img src="/fun.jpg" alt="두근두근 재밌는 발명의 세계" />
+          </div>
           <p class="subtitle">나만의 기발한 발명 아이디어를 떠올려 볼까?</p>
         </header>
         <div class="card">
@@ -68,8 +71,25 @@
           <h2>3단계. 나의 발명 카드</h2>
           <p class="question">버튼을 눌러 발명 카드를 뽑아 보세요. 마음에 안 들면 다시 뽑을 수 있어요.</p>
 
-          <div class="card-display" id="inventionCardDisplay">
-            아직 카드를 뽑지 않았어요.
+          <!-- 가챠 슬롯 머신 효과 -->
+          <div class="gacha-container">
+            <div class="gacha-slot" id="gachaSlot">
+              <div class="gacha-card-item">더하기</div>
+              <div class="gacha-card-item">빼기</div>
+              <div class="gacha-card-item">모양 바꾸기</div>
+              <div class="gacha-card-item">크게 또는 작게</div>
+              <div class="gacha-card-item">반대로 생각하기</div>
+              <div class="gacha-card-item">자연물 본뜨기</div>
+              <div class="gacha-card-item">용도 바꾸기</div>
+              <div class="gacha-card-item">재료 바꾸기</div>
+              <div class="gacha-card-item">남의 아이디어 빌리기</div>
+              <div class="gacha-card-item">폐품 활용하기</div>
+            </div>
+            <div class="gacha-result" id="gachaResult">
+              <div class="card-display" id="inventionCardDisplay">
+                아직 카드를 뽑지 않았어요.
+              </div>
+            </div>
           </div>
 
           <div class="card-buttons">
@@ -124,6 +144,30 @@
             ></textarea>
           </div>
 
+          <div class="form-group">
+            <label>발명 아이디어 스케치하기</label>
+            <div class="sketch-container">
+              <div class="sketch-toolbar">
+                <div class="sketch-tools">
+                  <button type="button" class="sketch-tool-btn active" data-tool="pen" title="펜">
+                    ✏️
+                  </button>
+                  <button type="button" class="sketch-tool-btn" data-tool="eraser" title="지우개">
+                    🧹
+                  </button>
+                  <input type="color" id="sketchColor" value="#000000" title="색상 선택" />
+                  <input type="range" id="sketchSize" min="1" max="20" value="3" title="선 두께" />
+                  <span class="sketch-size-label" id="sketchSizeLabel">3px</span>
+                  <button type="button" class="sketch-tool-btn" id="clearSketch" title="전체 지우기">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              <canvas id="sketchCanvas" width="600" height="400"></canvas>
+            </div>
+            <input type="hidden" name="sketchImage" id="gf_sketchImage" />
+          </div>
+
           <p class="encourage">
             여기까지 잘 해냈어요! 👏<br />
             지금까지 정리한 내용을 선생님께 보내고,<br />
@@ -150,6 +194,7 @@
             <input type="hidden" name="entry.1436421567" id="gf_problemText" />
             <input type="hidden" name="inventionCard" id="gf_inventionCard" />
             <input type="hidden" name="entry.399385104" id="gf_ideaText" />
+            <input type="hidden" name="sketchImage" id="gf_sketchImage" />
 
             <div class="actions">
               <button class="btn ghost" data-prev type="button">이전</button>

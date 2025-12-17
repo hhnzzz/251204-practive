@@ -58,6 +58,20 @@ body {
   color: transparent;
 }
 
+.header-visual {
+  margin: 10px auto 6px;
+  display: flex;
+  justify-content: center;
+}
+
+.header-visual img {
+  width: min(220px, 60vw);
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
 .subtitle {
   margin-top: 8px;
   margin-bottom: 0;
@@ -180,6 +194,78 @@ textarea:focus {
   background-color: #f0ecff;
 }
 
+/* 가챠 슬롯 머신 스타일 */
+.gacha-container {
+  margin: 20px 0;
+  position: relative;
+}
+
+.gacha-slot {
+  height: 80px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fff2ff 0%, #fdf8ff 50%, #fff2ff 100%);
+  border: 2px solid #f7b5ff;
+  position: relative;
+  display: none;
+  box-shadow: inset 0 0 20px rgba(247, 181, 255, 0.3);
+}
+
+.gacha-slot.spinning {
+  display: block;
+}
+
+.gacha-card-item {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #c24bb5;
+  border-bottom: 1px solid rgba(194, 75, 181, 0.2);
+}
+
+@keyframes slotSpin {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-80px);
+  }
+}
+
+.gacha-slot .gacha-card-item {
+  transition: none;
+}
+
+.gacha-slot:not(.spinning) .gacha-card-item {
+  animation: none;
+}
+
+.gacha-result {
+  display: none;
+}
+
+.gacha-result.show {
+  display: block;
+  animation: revealCard 0.8s ease-out;
+}
+
+@keyframes revealCard {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotateY(180deg);
+  }
+  50% {
+    transform: scale(1.1) rotateY(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateY(0deg);
+  }
+}
+
 .card-display {
   margin: 14px 0;
   padding: 14px;
@@ -287,7 +373,102 @@ textarea:focus {
   font-size: 0.85rem;
   text-align: center;
   color: #666;
+}
+
+/* 그림판 스타일 */
+.sketch-container {
+  border: 2px solid #e0d7ff;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sketch-toolbar {
+  background: linear-gradient(135deg, #faf7ff, #fff5ef);
+  padding: 10px;
+  border-bottom: 1px solid #e0d7ff;
+}
+
+.sketch-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sketch-tool-btn {
+  background: #fff;
+  border: 2px solid #e0d7ff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sketch-tool-btn:hover {
+  background: #f0ecff;
+  border-color: #c39cff;
+  transform: translateY(-1px);
+}
+
+.sketch-tool-btn.active {
+  background: linear-gradient(135deg, #c39cff, #ff9f7f);
+  border-color: #a87cff;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(195, 156, 255, 0.3);
+}
+
+#sketchColor {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e0d7ff;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 2px;
+}
+
+#sketchSize {
+  width: 100px;
+  height: 6px;
+  cursor: pointer;
+}
+
+.sketch-size-label {
+  font-size: 0.85rem;
+  color: #666;
+  min-width: 35px;
+}
+
+#sketchCanvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+@media (max-width: 720px) {
+  #sketchCanvas {
+    height: 300px;
   }
+  
+  .sketch-tools {
+    gap: 6px;
+  }
+  
+  .sketch-tool-btn {
+    padding: 6px 10px;
+    font-size: 1rem;
+  }
+  
+  #sketchColor {
+    width: 35px;
+    height: 35px;
+  }
+}
 
 @keyframes fadeIn {
   from {
