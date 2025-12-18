@@ -317,126 +317,11 @@ function initApp() {
   const googleFormUrls = {
     '1': 'https://docs.google.com/forms/d/e/1FAIpQLSccO-pVdGLv5VNT7XYUoUfCV0wmqMKeWyUZ296Br7fyhwiLhA/formResponse',
     '2': 'https://docs.google.com/forms/d/e/1FAIpQLSfVmtcR1Dvdh5MKjV8-nTIhdSG_IvfghoYWh956mOHny4w2pg/formResponse',
-    '3': 'https://docs.google.com/forms/d/e/15UOQEL-rcys7xGY04pYKRMQfY14JLOLV7_QX3LApLJA/formResponse'
+    '3': 'https://docs.google.com/forms/d/e/1FAIpQLScJ0UTVz-bWy4LDQT9WDlF9BHkGGNkiahrvgK7zGO2tMXyBkw/formResponse'
   }
 
-  // 제출 처리 함수
-  async function submitLevel(level, data) {
-    const formUrl = googleFormUrls[level]
-    if (!formUrl) {
-      console.warn(`Level ${level}의 구글 폼 URL이 설정되지 않았습니다.`)
-      return false
-    }
-
-    console.log(`Level ${level} 제출 시작:`, data)
-
-    // FormData 생성
-    const formData = new FormData()
-    
-    // 레벨별 entry 번호 설정
-    if (level === '1') {
-      // Level 1 entry 번호 설정
-      if (data.number) formData.append('entry.1465581057', data.number) // 번호
-      if (data.name) formData.append('entry.842649084', data.name) // 이름
-      if (data.description) formData.append('entry.1925242', data.description) // 발명 설명
-      // 그림은 base64로 텍스트 필드에 저장 (구글 폼 파일 업로드는 복잡함)
-      if (data.sketch) {
-        // base64 데이터가 너무 길면 잘라서 저장
-        const sketchData = data.sketch.length > 50000 ? data.sketch.substring(0, 50000) + '...' : data.sketch
-        formData.append('entry.781929115', sketchData) // Level 1 그림 (base64)
-      }
-    } else if (level === '2') {
-      // Level 2 entry 번호 설정
-      if (data.number) formData.append('entry.670944922', data.number) // 번호
-      if (data.name) formData.append('entry.260370643', data.name) // 이름
-      if (data.problem) formData.append('entry.1436421567', data.problem) // 불편했던 경험
-      if (data.description) formData.append('entry.399385104', data.description) // 나만의 발명아이디어
-      // 그림은 base64로 텍스트 필드에 저장
-      if (data.sketch) {
-        const sketchData = data.sketch.length > 50000 ? data.sketch.substring(0, 50000) + '...' : data.sketch
-        formData.append('entry.1046076771', sketchData) // Level 2 그림 (base64)
-      }
-    } else if (level === '3') {
-      // Level 3 entry 번호 설정
-      if (data.teamMembers) formData.append('entry.114543920', data.teamMembers) // 모둠원 입력
-      if (data.description) formData.append('entry.1497466334', data.description) // 발명 설명
-      // 그림은 base64로 텍스트 필드에 저장
-      if (data.sketch) {
-        const sketchData = data.sketch.length > 50000 ? data.sketch.substring(0, 50000) + '...' : data.sketch
-        formData.append('entry.395333856', sketchData) // Level 3 아이디어 스캐치 (base64)
-      }
-    }
-
-    // 구글 폼 제출 (no-cors 모드 - 응답은 받을 수 없지만 제출은 됨)
-    try {
-      const response = await fetch(formUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: formData,
-      })
-      console.log(`Level ${level} 구글 폼 제출 완료 (no-cors 모드)`)
-    } catch (error) {
-      console.error(`Level ${level} 구글 폼 제출 오류:`, error)
-      // no-cors 모드에서는 에러가 발생해도 실제로는 제출되었을 수 있음
-    }
-
-    // 추가로 iframe 방식도 시도 (이중 제출로 안정성 향상)
-    try {
-      let iframe = document.getElementById('googleFormIframe')
-      if (!iframe) {
-        iframe = document.createElement('iframe')
-        iframe.id = 'googleFormIframe'
-        iframe.name = 'googleFormIframe'
-        iframe.style.display = 'none'
-        document.body.appendChild(iframe)
-      }
-
-      let form = document.getElementById('googleForm')
-      if (form) {
-        form.remove()
-      }
-      form = document.createElement('form')
-      form.id = 'googleForm'
-      form.method = 'POST'
-      form.action = formUrl
-      form.target = 'googleFormIframe'
-      form.style.display = 'none'
-      document.body.appendChild(form)
-
-      // 폼 필드 추가
-      if (level === '1') {
-        if (data.number) addHiddenInput(form, 'entry.1465581057', data.number)
-        if (data.name) addHiddenInput(form, 'entry.842649084', data.name)
-        if (data.description) addHiddenInput(form, 'entry.1925242', data.description)
-        if (data.sketch) {
-          const sketchData = data.sketch.length > 50000 ? data.sketch.substring(0, 50000) + '...' : data.sketch
-          addHiddenInput(form, 'entry.781929115', sketchData)
-        }
-      } else if (level === '2') {
-        if (data.number) addHiddenInput(form, 'entry.670944922', data.number)
-        if (data.name) addHiddenInput(form, 'entry.260370643', data.name)
-        if (data.problem) addHiddenInput(form, 'entry.1436421567', data.problem)
-        if (data.description) addHiddenInput(form, 'entry.399385104', data.description)
-        if (data.sketch) {
-          const sketchData = data.sketch.length > 50000 ? data.sketch.substring(0, 50000) + '...' : data.sketch
-          addHiddenInput(form, 'entry.1046076771', sketchData)
-        }
-      } else if (level === '3') {
-        if (data.teamMembers) addHiddenInput(form, 'entry.114543920', data.teamMembers)
-        if (data.description) addHiddenInput(form, 'entry.1497466334', data.description)
-        if (data.sketch) {
-          const sketchData = data.sketch.length > 50000 ? data.sketch.substring(0, 50000) + '...' : data.sketch
-          addHiddenInput(form, 'entry.395333856', sketchData)
-        }
-      }
-
-      form.submit()
-      console.log(`Level ${level} iframe 방식 제출 완료`)
-    } catch (error) {
-      console.error(`Level ${level} iframe 방식 제출 오류:`, error)
-    }
-
-    // 로컬 스토리지에 저장 (나중에 API로 교체 가능)
+  // 로컬 스토리지에 저장 (즉시 실행)
+  function saveToLocalStorage(level, data) {
     try {
       const submissions = JSON.parse(localStorage.getItem(`submissions_level${level}`) || '[]')
       submissions.push({
@@ -445,15 +330,160 @@ function initApp() {
       })
       localStorage.setItem(`submissions_level${level}`, JSON.stringify(submissions))
       console.log(`Level ${level} 로컬 스토리지 저장 완료`)
+      return true
     } catch (error) {
       console.error(`Level ${level} 로컬 스토리지 저장 오류:`, error)
+      return false
     }
+  }
+
+  // 구글 폼 제출 (백그라운드에서 비동기 처리)
+  function submitToGoogleForm(level, data) {
+    const formUrl = googleFormUrls[level]
+    if (!formUrl) {
+      console.warn(`Level ${level}의 구글 폼 URL이 설정되지 않았습니다.`)
+      return
+    }
+
+    console.log(`Level ${level} 구글 폼 제출 시작:`, data)
+
+    // fetch 방식으로 제출 (사용자 요구사항에 맞춤)
+    try {
+      const params = new URLSearchParams()
+      
+      // 레벨별 entry 번호 설정
+      if (level === '1') {
+        // Level 1: 번호, 이름, 발명설명, 그림
+        if (data.number) params.append('entry.1465581057', String(data.number))
+        if (data.name) params.append('entry.842649084', String(data.name))
+        if (data.description) params.append('entry.1925242', String(data.description))
+        if (data.sketch) {
+          // 이미지 데이터는 base64 문자열로 전송 (너무 길면 URL만 전송)
+          const imageData = data.sketch.length > 100000 
+            ? '[이미지 데이터가 너무 깁니다. 로컬 스토리지에서 확인하세요.]' 
+            : data.sketch
+          params.append('entry.781929115', imageData)
+        }
+      } else if (level === '2') {
+        // Level 2: 번호, 이름, 불편한점, 아이디어설명, 그림
+        if (data.number) params.append('entry.670944922', String(data.number))
+        if (data.name) params.append('entry.260370643', String(data.name))
+        if (data.problem) params.append('entry.1436421567', String(data.problem))
+        if (data.description) params.append('entry.399385104', String(data.description))
+        if (data.sketch) {
+          const imageData = data.sketch.length > 100000 
+            ? '[이미지 데이터가 너무 깁니다. 로컬 스토리지에서 확인하세요.]' 
+            : data.sketch
+          params.append('entry.1046076771', imageData)
+        }
+      } else if (level === '3') {
+        // Level 3: 이름(모둠원), 아이디어설명, 그림
+        if (data.teamMembers) params.append('entry.114543920', String(data.teamMembers))
+        if (data.description) params.append('entry.1497466334', String(data.description))
+        if (data.sketch) {
+          const imageData = data.sketch.length > 100000 
+            ? '[이미지 데이터가 너무 깁니다. 로컬 스토리지에서 확인하세요.]' 
+            : data.sketch
+          params.append('entry.395333856', imageData)
+        }
+      }
+
+      // 제출 전 로그
+      console.log(`Level ${level} 구글 폼 제출 데이터:`, {
+        url: formUrl,
+        params: Object.fromEntries(params)
+      })
+
+      // fetch로 제출
+      fetch(formUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+      }).then(() => {
+        console.log(`Level ${level} 구글 폼 제출 완료 (fetch)`)
+      }).catch((error) => {
+        console.error(`Level ${level} 구글 폼 제출 오류 (fetch):`, error)
+      })
+
+      // 추가로 iframe 방식도 시도 (안정성 향상)
+      setTimeout(() => {
+        try {
+          let iframe = document.getElementById('googleFormIframe')
+          if (!iframe) {
+            iframe = document.createElement('iframe')
+            iframe.id = 'googleFormIframe'
+            iframe.name = 'googleFormIframe'
+            iframe.style.display = 'none'
+            iframe.width = '0'
+            iframe.height = '0'
+            document.body.appendChild(iframe)
+          }
+
+          const existingForm = document.getElementById(`googleForm_${level}`)
+          if (existingForm) {
+            existingForm.remove()
+          }
+
+          const form = document.createElement('form')
+          form.id = `googleForm_${level}`
+          form.method = 'POST'
+          form.action = formUrl
+          form.target = 'googleFormIframe'
+          form.enctype = 'application/x-www-form-urlencoded'
+          form.style.display = 'none'
+          document.body.appendChild(form)
+
+          // 폼 필드 추가
+          if (level === '1') {
+            if (data.number) addHiddenInput(form, 'entry.1465581057', String(data.number))
+            if (data.name) addHiddenInput(form, 'entry.842649084', String(data.name))
+            if (data.description) addHiddenInput(form, 'entry.1925242', String(data.description))
+            if (data.sketch && data.sketch.length <= 100000) {
+              addHiddenInput(form, 'entry.781929115', data.sketch)
+            }
+          } else if (level === '2') {
+            if (data.number) addHiddenInput(form, 'entry.670944922', String(data.number))
+            if (data.name) addHiddenInput(form, 'entry.260370643', String(data.name))
+            if (data.problem) addHiddenInput(form, 'entry.1436421567', String(data.problem))
+            if (data.description) addHiddenInput(form, 'entry.399385104', String(data.description))
+            if (data.sketch && data.sketch.length <= 100000) {
+              addHiddenInput(form, 'entry.1046076771', data.sketch)
+            }
+          } else if (level === '3') {
+            if (data.teamMembers) addHiddenInput(form, 'entry.114543920', String(data.teamMembers))
+            if (data.description) addHiddenInput(form, 'entry.1497466334', String(data.description))
+            if (data.sketch && data.sketch.length <= 100000) {
+              addHiddenInput(form, 'entry.395333856', data.sketch)
+            }
+          }
+
+          form.submit()
+          console.log(`Level ${level} iframe 방식 제출 완료`)
+        } catch (error) {
+          console.error(`Level ${level} iframe 방식 제출 오류:`, error)
+        }
+      }, 300)
+    } catch (error) {
+      console.error(`Level ${level} 구글 폼 제출 오류:`, error)
+    }
+  }
+
+  // 제출 처리 함수 (즉시 반환, 백그라운드에서 구글 폼 제출)
+  function submitLevel(level, data) {
+    // 1. 먼저 로컬 스토리지에 저장 (즉시)
+    const saved = saveToLocalStorage(level, data)
     
-    return true
+    // 2. 백그라운드에서 구글 폼 제출 (비동기)
+    submitToGoogleForm(level, data)
+    
+    return saved
   }
 
   // Level 1 제출
-  document.getElementById('l1_submitBtn')?.addEventListener('click', async () => {
+  document.getElementById('l1_submitBtn')?.addEventListener('click', () => {
     const number = document.getElementById('l1_studentNumber')?.value.trim()
     const name = document.getElementById('l1_studentName')?.value.trim()
     const description = document.getElementById('l1_description')?.value.trim()
@@ -464,8 +494,10 @@ function initApp() {
       return
     }
 
-    const success = await submitLevel('1', { number, name, description, sketch })
+    // 제출 처리 (즉시 실행)
+    const success = submitLevel('1', { number, name, description, sketch })
     if (success) {
+      // 즉시 화면 전환 및 내용 공유
       showStep('level1-3')
       loadSubmissions('l1_submissions', '1')
     } else {
@@ -474,7 +506,7 @@ function initApp() {
   })
 
   // Level 2 제출
-  document.getElementById('l2_submitBtn')?.addEventListener('click', async () => {
+  document.getElementById('l2_submitBtn')?.addEventListener('click', () => {
     const number = document.getElementById('l2_studentNumber')?.value.trim()
     const name = document.getElementById('l2_studentName')?.value.trim()
     const problem = document.getElementById('l2_problemText')?.value.trim()
@@ -486,8 +518,10 @@ function initApp() {
       return
     }
 
-    const success = await submitLevel('2', { number, name, problem, card: l2_currentCard, description, sketch })
+    // 제출 처리 (즉시 실행)
+    const success = submitLevel('2', { number, name, problem, card: l2_currentCard, description, sketch })
     if (success) {
+      // 즉시 화면 전환 및 내용 공유
       showStep('level2-5')
       loadSubmissions('l2_submissions', '2')
     } else {
@@ -496,7 +530,7 @@ function initApp() {
   })
 
   // Level 3 제출
-  document.getElementById('l3_submitBtn')?.addEventListener('click', async () => {
+  document.getElementById('l3_submitBtn')?.addEventListener('click', () => {
     const teamMembers = document.getElementById('l3_teamMembers')?.value.trim()
     const description = document.getElementById('l3_description')?.value.trim()
     const sketch = document.querySelector('[data-step="level3-3"] .sketch-image-data')?.value
@@ -506,8 +540,10 @@ function initApp() {
       return
     }
 
-    const success = await submitLevel('3', { teamMembers, description, sketch })
+    // 제출 처리 (즉시 실행)
+    const success = submitLevel('3', { teamMembers, description, sketch })
     if (success) {
+      // 즉시 화면 전환 및 내용 공유
       showStep('level3-4')
       loadSubmissions('l3_submissions', '3')
     } else {
@@ -515,7 +551,7 @@ function initApp() {
     }
   })
 
-  // 다른 학생들 제출 내용 불러오기
+  // 제출 내용 불러오기 (자신의 제출 포함)
   function loadSubmissions(containerId, level) {
     const container = document.getElementById(containerId)
     if (!container) return
@@ -523,17 +559,20 @@ function initApp() {
     // 현재는 로컬 스토리지에서 불러오기 (나중에 API로 교체)
     const submissions = JSON.parse(localStorage.getItem(`submissions_level${level}`) || '[]')
     
-    // 자신의 제출은 제외하고 표시
-    const otherSubmissions = submissions.slice(0, -1).reverse() // 최신순, 자신 제외
+    // 모든 제출을 최신순으로 표시 (자신의 제출 포함)
+    const allSubmissions = [...submissions].reverse() // 최신순
     
-    if (otherSubmissions.length === 0) {
-      container.innerHTML = '<p class="no-submissions">아직 다른 친구들의 제출 내용이 없어요. 첫 번째가 되세요! 🎉</p>'
+    if (allSubmissions.length === 0) {
+      container.innerHTML = '<p class="no-submissions">아직 제출 내용이 없어요. 첫 번째가 되세요! 🎉</p>'
       return
     }
 
-    container.innerHTML = otherSubmissions.map((sub, index) => {
-      let content = `<div class="submission-item">
+    container.innerHTML = allSubmissions.map((sub, index) => {
+      // 자신의 제출인지 확인 (가장 최신 제출이 자신의 것)
+      const isMySubmission = index === 0
+      let content = `<div class="submission-item ${isMySubmission ? 'my-submission' : ''}">
         <div class="submission-header">
+          ${isMySubmission ? '<span class="my-badge">내 아이디어</span>' : ''}
           <span class="submission-number">#${index + 1}</span>`
       
       if (level === '1') {
