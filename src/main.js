@@ -304,77 +304,106 @@ function initApp() {
     }
   })
 
+  // 숨김 입력 필드 추가 헬퍼 함수
+  function addHiddenInput(form, name, value) {
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = name
+    input.value = value
+    form.appendChild(input)
+  }
+
+  // 레벨별 구글 폼 URL
+  const googleFormUrls = {
+    '1': 'https://docs.google.com/forms/d/e/1FAIpQLSccO-pVdGLv5VNT7XYUoUfCV0wmqMKeWyUZ296Br7fyhwiLhA/formResponse',
+    '2': 'https://docs.google.com/forms/d/e/1FAIpQLSfVmtcR1Dvdh5MKjV8-nTIhdSG_IvfghoYWh956mOHny4w2pg/formResponse',
+    '3': 'https://docs.google.com/forms/d/15UOQEL-rcys7xGY04pYKRMQfY14JLOLV7_QX3LApLJA/formResponse'
+  }
+
   // 제출 처리 함수
   async function submitLevel(level, data) {
-    // 구글 폼 전송
-    const form = document.getElementById('googleForm')
+    // 구글 폼 전송 (iframe 방식 사용)
+    const formUrl = googleFormUrls[level]
+    if (!formUrl) {
+      console.warn(`Level ${level}의 구글 폼 URL이 설정되지 않았습니다.`)
+      return false
+    }
+
+    // iframe 생성 (숨김)
+    let iframe = document.getElementById('googleFormIframe')
+    if (!iframe) {
+      iframe = document.createElement('iframe')
+      iframe.id = 'googleFormIframe'
+      iframe.name = 'googleFormIframe'
+      iframe.style.display = 'none'
+      document.body.appendChild(iframe)
+    }
+
+    // 동적으로 폼 생성
+    let form = document.getElementById('googleForm')
     if (form) {
-      const formData = new FormData()
+      form.remove()
+    }
+    form = document.createElement('form')
+    form.id = 'googleForm'
+    form.method = 'POST'
+    form.action = formUrl
+    form.target = 'googleFormIframe'
+    form.style.display = 'none'
+    document.body.appendChild(form)
+      
+    // 폼 필드 초기화 및 값 설정
       
       // 레벨별 entry 번호 설정
-      // ⚠️ 아래 entry 번호들을 실제 구글 폼의 entry 번호로 변경하세요!
-      
       if (level === '1') {
         // Level 1 entry 번호 설정
-        formData.set('entry.XXXXXXXXX', '1') // 레벨 (Level 1)
-        if (data.number) formData.set('entry.1465581057', data.number) // 번호
-        if (data.name) formData.set('entry.842649084', data.name) // 이름
-        if (data.description) formData.set('entry.1925242', data.description) // 발명 설명
-        // 그림은 아래에서 처리
+        addHiddenInput(form, 'entry.XXXXXXXXX', '1') // 레벨 (Level 1) - 실제 entry 번호로 변경 필요
+        if (data.number) addHiddenInput(form, 'entry.1465581057', data.number) // 번호
+        if (data.name) addHiddenInput(form, 'entry.842649084', data.name) // 이름
+        if (data.description) addHiddenInput(form, 'entry.1925242', data.description) // 발명 설명
+        // 그림은 base64로 텍스트 필드에 저장 (구글 폼 파일 업로드는 복잡함)
+        if (data.sketch) {
+          addHiddenInput(form, 'entry.781929115', data.sketch) // Level 1 그림 (base64)
+        }
       } else if (level === '2') {
         // Level 2 entry 번호 설정
-        formData.set('entry.XXXXXXXXX', '2') // 레벨 (Level 2)
-        if (data.number) formData.set('entry.670944922', data.number) // 번호
-        if (data.name) formData.set('entry.260370643', data.name) // 이름
-        if (data.problem) formData.set('entry.1436421567', data.problem) // 불편했던 경험
-        if (data.card) formData.set('entry.XXXXXXXXX', data.card) // 발명 카드
-        if (data.description) formData.set('entry.399385104', data.description) // 나만의 발명아이디어
-        // 그림은 아래에서 처리
+        addHiddenInput(form, 'entry.XXXXXXXXX', '2') // 레벨 (Level 2) - 실제 entry 번호로 변경 필요
+        if (data.number) addHiddenInput(form, 'entry.670944922', data.number) // 번호
+        if (data.name) addHiddenInput(form, 'entry.260370643', data.name) // 이름
+        if (data.problem) addHiddenInput(form, 'entry.1436421567', data.problem) // 불편했던 경험
+        if (data.card) addHiddenInput(form, 'entry.XXXXXXXXX', data.card) // 발명 카드 - 실제 entry 번호로 변경 필요
+        if (data.description) addHiddenInput(form, 'entry.399385104', data.description) // 나만의 발명아이디어
+        // 그림은 base64로 텍스트 필드에 저장
+        if (data.sketch) {
+          addHiddenInput(form, 'entry.1046076771', data.sketch) // Level 2 그림 (base64)
+        }
       } else if (level === '3') {
         // Level 3 entry 번호 설정
-        formData.set('entry.XXXXXXXXX', '3') // 레벨 (Level 3)
-        if (data.teamMembers) formData.set('entry.114543920', data.teamMembers) // 모둠원 입력
-        if (data.description) formData.set('entry.1497466334', data.description) // 발명 설명
-        // 그림은 아래에서 처리
-      }
-
-      // 그림 데이터
-      if (data.sketch) {
-        try {
-          const base64Data = data.sketch.split(',')[1]
-          const byteCharacters = atob(base64Data)
-          const byteNumbers = new Array(byteCharacters.length)
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i)
-          }
-          const byteArray = new Uint8Array(byteNumbers)
-          const blob = new Blob([byteArray], { type: 'image/png' })
-          const fileName = `발명_Level${level}_${data.name || data.teamMembers || '학생'}_${Date.now()}.png`
-          const file = new File([blob], fileName, { type: 'image/png' })
-          
-          // 그림 파일 업로드 entry 번호 (레벨별로 다를 수 있음)
-          if (level === '1') {
-            formData.append('entry.781929115', file, fileName) // Level 1 그림 entry 번호
-          } else if (level === '2') {
-            formData.append('entry.1046076771', file, fileName) // Level 2 그림 entry 번호
-          } else if (level === '3') {
-            formData.append('entry.395333856', file, fileName) // Level 3 아이디어 스캐치
-          }
-        } catch (error) {
-          console.error('그림 변환 오류:', error)
+        addHiddenInput(form, 'entry.XXXXXXXXX', '3') // 레벨 (Level 3) - 실제 entry 번호로 변경 필요
+        if (data.teamMembers) addHiddenInput(form, 'entry.114543920', data.teamMembers) // 모둠원 입력
+        if (data.description) addHiddenInput(form, 'entry.1497466334', data.description) // 발명 설명
+        // 그림은 base64로 텍스트 필드에 저장
+        if (data.sketch) {
+          addHiddenInput(form, 'entry.395333856', data.sketch) // Level 3 아이디어 스캐치 (base64)
         }
       }
 
-      try {
-        await fetch(form.action, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: formData,
-        })
-      } catch (err) {
-        console.error('구글 폼 전송 오류:', err)
+    // iframe 로드 완료 이벤트 리스너
+    return new Promise((resolve) => {
+      iframe.onload = () => {
+        console.log(`Level ${level} 구글 폼 제출 완료`)
+        resolve(true)
       }
-    }
+      
+      // 폼 제출
+      form.submit()
+      
+      // 타임아웃 설정 (5초 후 성공으로 간주)
+      setTimeout(() => {
+        console.log(`Level ${level} 구글 폼 제출 완료 (타임아웃)`)
+        resolve(true)
+      }, 5000)
+    })
 
     // 로컬 스토리지에 저장 (나중에 API로 교체 가능)
     const submissions = JSON.parse(localStorage.getItem(`submissions_level${level}`) || '[]')
